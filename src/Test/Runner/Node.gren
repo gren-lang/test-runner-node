@@ -1,0 +1,27 @@
+module Test.Runner.Node exposing (Program, run)
+
+import Test exposing (Test)
+import Node
+import Node.Program as NodeP
+
+
+type alias Program =
+    NodeP.Program {} {}
+
+
+run : Test -> Program
+run suite =
+    NodeP.define
+        { init = init
+        , update = (\_ _ -> { model = {}, command = Cmd.none })
+        , subscriptions = \_ -> Sub.none
+        }
+
+
+init : NodeP.AppInitTask { model : {}, command : Cmd {} }
+init =
+    NodeP.await Node.initialize <| \nodeConfig ->
+        NodeP.startProgram 
+            { model = {}
+            , command = Cmd.none
+            }
