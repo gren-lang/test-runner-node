@@ -3,6 +3,7 @@ module Test.Runner.Node exposing (Program, run)
 import Test exposing (Test)
 import Node
 import Node.Program as NodeP
+import Test.Runner.Log as Log
 
 
 type alias Program =
@@ -10,17 +11,20 @@ type alias Program =
 
 
 run : Test -> Program
-run suite =
+run test =
     NodeP.define
-        { init = init
+        { init = init test
         , update = (\_ _ -> { model = {}, command = Cmd.none })
         , subscriptions = \_ -> Sub.none
         }
 
 
-init : NodeP.AppInitTask { model : {}, command : Cmd {} }
-init =
+init : Test -> NodeP.AppInitTask { model : {}, command : Cmd {} }
+init test =
     NodeP.await Node.initialize <| \nodeConfig ->
+        let
+            _ = Log.run test
+        in
         NodeP.startProgram 
             { model = {}
             , command = Cmd.none
