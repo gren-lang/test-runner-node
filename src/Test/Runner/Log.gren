@@ -25,23 +25,32 @@ import Random
 import Test.Runner.String exposing (Summary)
 import String
 import Test exposing (Test)
+import Stream exposing (Stream)
+import Bytes.Encode as BE
+import Node
+
+
+type alias OutputStreams =
+    { reportStreamOnPass : Stream
+    , reportStreamOnFail : Stream
+    }
 
 
 {-| Run the test using the default `Test.Runner.String` options.
 -}
-run : Test -> {}
-run test =
+run : OutputStreams -> Test -> Cmd a
+run streams test =
     Test.Runner.String.run test
-        |> logOutput
+        |> logOutput streams
 
 
 {-| Run the test using the provided options.
 -}
-runWithOptions : Int -> Random.Seed -> Test -> {}
-runWithOptions runs seed test =
+runWithOptions : OutputStreams -> Int -> Random.Seed -> Test -> Cmd a
+runWithOptions streams runs seed test =
     Test.Runner.String.runWithOptions runs seed test
-        |> logOutput
-
+        |> logOutput streams
+ 
 
 summarize : Summary -> String
 summarize { output, passed, failed, autoFail } =
@@ -66,22 +75,26 @@ summarize { output, passed, failed, autoFail } =
         ]
 
 
-logOutput : Summary -> {}
-logOutput summary =
+logOutput : OutputStreams -> Summary -> Cmd a
+logOutput streams summary =
     let
         output =
-            summarize summary ++ "\n\nExit code"
+            summarize summary
 
-        _ =
+        { printStream, exitCode } =
             if summary.failed > 0 || summary.autoFail /= Nothing then
-                output
-                    |> (\a -> Debug.log a 1)
-                    |> (\_ -> Debug.todo "FAILED TEST RUN")
-                    |> (\_ -> {})
+                { printStream = streams.reportStreamOnFail
+                , exitCode = 1
+                }
 
             else
-                output
-                    |> (\a -> Debug.log a 0)
-                    |> (\_ -> {})
+                { printStream = streams.reportStreamOnPass
+                , exitCode = 0
+                }
     in
-    {}
+    Cmd.batch
+        [ Stream.send printStream <| BE.encode <| BE.string <| output
+        -- TODO:
+        --, Node.exitWithCode exitCode
+        ]
+

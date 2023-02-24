@@ -22,10 +22,12 @@ run test =
 init : Test -> NodeP.AppInitTask { model : {}, command : Cmd {} }
 init test =
     NodeP.await Node.initialize <| \nodeConfig ->
-        let
-            _ = Log.run test
-        in
         NodeP.startProgram 
             { model = {}
-            , command = Cmd.none
+            , command =
+                Log.run
+                    { reportStreamOnPass = nodeConfig.stdout
+                    , reportStreamOnFail = nodeConfig.stderr
+                    }
+                    test
             }
