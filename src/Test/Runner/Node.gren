@@ -4,10 +4,14 @@ import Test exposing (Test)
 import Node
 import Node.Program as NodeP
 import Test.Runner.Log as Log
+import Random
 
 
 type alias Program =
     NodeP.Program {} {}
+
+
+-- RUN
 
 
 run : Test -> Program
@@ -29,5 +33,39 @@ init test =
                     { reportStreamOnPass = nodeConfig.stdout
                     , reportStreamOnFail = nodeConfig.stderr
                     }
+                    test
+            }
+
+
+-- RUN WITH OPTIONS
+
+
+type alias Options =
+    { runs : Int
+    , seed : Random.Seed
+    }
+
+
+runWithOptions : Options -> Test -> Program
+runWithOptions options test =
+    NodeP.define
+        { init = initWithOptions options test
+        , update = (\_ _ -> { model = {}, command = Cmd.none })
+        , subscriptions = \_ -> Sub.none
+        }
+
+
+initWithOptions : Options -> Test -> NodeP.AppInitTask { model : {}, command : Cmd {} }
+initWithOptions options test =
+    NodeP.await Node.initialize <| \nodeConfig ->
+        NodeP.startProgram 
+            { model = {}
+            , command =
+                Log.runWithOptions
+                    { reportStreamOnPass = nodeConfig.stdout
+                    , reportStreamOnFail = nodeConfig.stderr
+                    }
+                    options.runs
+                    options.seed
                     test
             }
