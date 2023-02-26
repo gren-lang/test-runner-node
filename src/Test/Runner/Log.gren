@@ -1,18 +1,9 @@
 module Test.Runner.Log exposing
-    ( run, runWithOptions
+    ( runWithOptions
     , logOutput
     )
 
 {-| Log Runner
-
-Runs a test and outputs its results using `Debug.log`, then calls `Debug.crash`
-if there are any failures.
-
-This is not the prettiest runner, but it is simple and cross-platform. For
-example, you can use it as a crude Node runner like so:
-
-    $ elm-make LogRunnerExample.elm --output=elm.js
-    $ node elm.js
 
 This will log the test results to the console, then exit with exit code 0
 if the tests all passed, and 1 if any failed.
@@ -34,14 +25,6 @@ type alias OutputStreams =
     { reportStreamOnPass : Stream
     , reportStreamOnFail : Stream
     }
-
-
-{-| Run the test using the default `Test.Runner.String` options.
--}
-run : OutputStreams -> Test -> Cmd a
-run streams test =
-    Test.Runner.String.run test
-        |> logOutput streams
 
 
 {-| Run the test using the provided options.
@@ -94,7 +77,6 @@ logOutput streams summary =
     in
     Cmd.batch
         [ Stream.send printStream <| BE.encode <| BE.string <| output
-        -- TODO:
-        --, Node.exitWithCode exitCode
+        , Node.setExitCode exitCode
         ]
 

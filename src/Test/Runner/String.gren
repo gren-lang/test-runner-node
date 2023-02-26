@@ -1,4 +1,4 @@
-module Test.Runner.String exposing (Summary, run, runWithOptions)
+module Test.Runner.String exposing (Summary, runWithOptions)
 
 {-| String Runner
 
@@ -129,16 +129,6 @@ outputLabels labels =
         |> String.join "\n"
 
 
-defaultSeed : Random.Seed
-defaultSeed =
-    Random.initialSeed 902101337
-
-
-defaultRuns : Int
-defaultRuns =
-    100
-
-
 wrap : String -> String -> String
 wrap delimiter string =
     delimiter ++ string ++ delimiter
@@ -150,16 +140,6 @@ indentLines str =
         |> String.split "\n"
         |> Array.map ((++) "    ")
         |> String.join "\n"
-
-
-{-| Run a test and return a Summary.
-
-Fuzz tests use a default run count of 100, and a fixed initial seed.
-
--}
-run : Test -> Summary
-run =
-    runWithOptions defaultRuns defaultSeed
 
 
 {-| Run a test and return a Summary.

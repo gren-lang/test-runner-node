@@ -5,6 +5,7 @@ import Node
 import Node.Program as NodeP
 import Test.Runner.Log as Log
 import Random
+import Time
 
 
 type alias Program =
@@ -26,13 +27,16 @@ run test =
 init : Test -> NodeP.AppInitTask { model : {}, command : Cmd {} }
 init test =
     NodeP.await Node.initialize <| \nodeConfig ->
+    NodeP.awaitTask Time.now <| \time ->
         NodeP.startProgram 
             { model = {}
             , command =
-                Log.run
+                Log.runWithOptions
                     { reportStreamOnPass = nodeConfig.stdout
                     , reportStreamOnFail = nodeConfig.stderr
                     }
+                    100
+                    (Random.initialSeed (Time.posixToMillis time))
                     test
             }
 
