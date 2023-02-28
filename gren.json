@@ -5,7 +5,7 @@
     "summary": "For running gren-lang/test suites on Node",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
-    "exposed-modules": ["Test.Runner.Node"],
+    "exposed-modules": ["Test.Runner.Node", "Test.Runner.String"],
     "gren-version": "0.2.1 <= v < 0.3.0",
     "dependencies": {
         "gren-lang/core": "3.0.2 <= v < 4.0.0",

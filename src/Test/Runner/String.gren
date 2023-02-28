@@ -5,9 +5,7 @@ module Test.Runner.String exposing (Summary, runWithOptions)
 Run a test and present its results as a nicely-formatted String, along with
 a count of how many tests passed and failed.
 
-Note that this always uses an initial seed of 902101337, since it can't do effects.
-
-@docs Summary, run, runWithOptions
+@docs Summary, runWithOptions
 
 -}
 
