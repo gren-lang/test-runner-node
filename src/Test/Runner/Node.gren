@@ -4,21 +4,6 @@ module Test.Runner.Node exposing (Program, Options, run, runWithOptions)
 
 An exit code of 1 will be set when there are failing tests.
 
-A minimal test program will have the following in a Main.gren file:
-
-    module Main exposing (main)
-
-    import Test exposing (describe, test)
-    import Test.Runner.Node exposing (Program, run)
-
-    main : Program
-    main =
-        run <|
-            describe "All tests"
-                [ test "Failing test" <| \_ ->
-                    Expect.equal True False
-                ]
-
 @docs Program, run
 
 ## Customization
