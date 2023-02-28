@@ -1,4 +1,31 @@
-module Test.Runner.Node exposing (Program, run)
+module Test.Runner.Node exposing (Program, Options, run, runWithOptions)
+
+{-| Define programs that run your tests and outputs the results to the terminal.
+
+An exit code of 1 will be set when there are failing tests.
+
+A minimal test program will have the following in a Main.gren file:
+
+    module Main exposing (main)
+
+    import Test exposing (describe, test)
+    import Test.Runner.Node exposing (Program, run)
+
+    main : Program
+    main =
+        run <|
+            describe "All tests"
+                [ test "Failing test" <| \_ ->
+                    Expect.equal True False
+                ]
+
+@docs Program, run
+
+## Customization
+
+@docs Options, runWithOptions
+
+-}
 
 import Test exposing (Test)
 import Node
@@ -8,6 +35,8 @@ import Random
 import Time
 
 
+{-| A value representing a test program.
+-}
 type alias Program =
     NodeP.Program {} {}
 
@@ -15,6 +44,8 @@ type alias Program =
 -- RUN
 
 
+{-| Run a test suite using default options.
+-}
 run : Test -> Program
 run test =
     NodeP.define
@@ -44,12 +75,20 @@ init test =
 -- RUN WITH OPTIONS
 
 
+{-| Different options you can use to customize your test run.
+
+* `runs` configures how many times a `fuzz` test is executed with different inputs.
+* `seed` is used to generate random input in `fuzz` tests. A test suite run with the same seed will generate the same fuzz values.
+
+-}
 type alias Options =
     { runs : Int
     , seed : Random.Seed
     }
 
 
+{-| Run a test suite using the provided options.
+-}
 runWithOptions : Options -> Test -> Program
 runWithOptions options test =
     NodeP.define
