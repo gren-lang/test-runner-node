@@ -4,12 +4,12 @@
     "name": "gren-lang/test-runner-node",
     "summary": "For running gren-lang/test suites on Node",
     "license": "BSD-3-Clause",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "exposed-modules": ["Test.Runner.Node", "Test.Runner.String"],
-    "gren-version": "0.2.1 <= v < 0.3.0",
+    "gren-version": "0.3.0 <= v < 0.4.0",
     "dependencies": {
-        "gren-lang/core": "3.0.2 <= v < 4.0.0",
-        "gren-lang/node": "1.2.0 <= v < 2.0.0",
-        "gren-lang/test": "1.0.0 <= v < 2.0.0"
+        "gren-lang/core": "4.0.0 <= v < 5.0.0",
+        "gren-lang/node": "2.0.0 <= v < 3.0.0",
+        "gren-lang/test": "2.0.0 <= v < 3.0.0"
     }
 }
