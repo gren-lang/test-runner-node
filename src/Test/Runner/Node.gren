@@ -14,7 +14,7 @@ An exit code of 1 will be set when there are failing tests.
 
 import Test exposing (Test)
 import Node
-import Node.Program as NodeP
+import Init
 import Test.Runner.Log as Log
 import Random
 import Time
@@ -23,7 +23,7 @@ import Time
 {-| A value representing a test program.
 -}
 type alias Program =
-    NodeP.Program {} {}
+    Node.SimpleProgram {}
 
 
 -- RUN
@@ -33,28 +33,16 @@ type alias Program =
 -}
 run : Test -> Program
 run test =
-    NodeP.define
-        { init = init test
-        , update = (\_ _ -> { model = {}, command = Cmd.none })
-        , subscriptions = \_ -> Sub.none
-        }
-
-
-init : Test -> NodeP.AppInitTask { model : {}, command : Cmd {} }
-init test =
-    NodeP.await Node.initialize <| \nodeConfig ->
-    NodeP.awaitTask Time.now <| \time ->
-        NodeP.startProgram 
-            { model = {}
-            , command =
+    Node.defineSimpleProgram <| \env ->
+        Init.awaitTask Time.now <| \time ->
+            Node.endWithCmd <|
                 Log.runWithOptions
-                    { reportStreamOnPass = nodeConfig.stdout
-                    , reportStreamOnFail = nodeConfig.stderr
+                    { reportStreamOnPass = env.stdout
+                    , reportStreamOnFail = env.stderr
                     }
                     100
                     (Random.initialSeed (Time.posixToMillis time))
                     test
-            }
 
 
 -- RUN WITH OPTIONS
@@ -76,24 +64,13 @@ type alias Options =
 -}
 runWithOptions : Options -> Test -> Program
 runWithOptions options test =
-    NodeP.define
-        { init = initWithOptions options test
-        , update = (\_ _ -> { model = {}, command = Cmd.none })
-        , subscriptions = \_ -> Sub.none
-        }
-
-
-initWithOptions : Options -> Test -> NodeP.AppInitTask { model : {}, command : Cmd {} }
-initWithOptions options test =
-    NodeP.await Node.initialize <| \nodeConfig ->
-        NodeP.startProgram 
-            { model = {}
-            , command =
-                Log.runWithOptions
-                    { reportStreamOnPass = nodeConfig.stdout
-                    , reportStreamOnFail = nodeConfig.stderr
-                    }
-                    options.runs
-                    options.seed
-                    test
-            }
+    Node.defineSimpleProgram <| \env ->
+        Node.endWithCmd <|
+            Log.runWithOptions
+                { reportStreamOnPass = env.stdout
+                , reportStreamOnFail = env.stderr
+                }
+                options.runs
+                options.seed
+                test
+           
