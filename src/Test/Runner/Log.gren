@@ -17,8 +17,8 @@ import Test.Runner.String exposing (Summary)
 import String
 import Test exposing (Test)
 import Stream exposing (Stream)
-import Bytes.Encode as BE
 import Node
+import Task
 
 
 type alias OutputStreams =
@@ -75,8 +75,7 @@ logOutput streams summary =
                 , exitCode = 0
                 }
     in
-    Cmd.batch
-        [ Stream.send printStream <| BE.encode <| BE.string <| output
-        , Node.setExitCode exitCode
-        ]
+    Stream.sendString printStream output
+        |> Task.andThen (\_ -> Node.exitWithCode exitCode)
+        |> Task.execute
 
