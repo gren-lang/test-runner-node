@@ -181,7 +181,7 @@ ond : (Int -> Maybe a) -> (Int -> Maybe a) -> Int -> Int -> Array { x : Int, y :
 ond getA getB m n =
     let
         v =
-            Array.initialize (m + n + 1) 0 (always [])
+            Array.initialize (m + n + 1) 0 (\_ -> [])
     in
     ondLoopDK (snake getA getB) m 0 0 v
 
@@ -214,7 +214,7 @@ onp : (Int -> Maybe a) -> (Int -> Maybe a) -> Int -> Int -> Array { x : Int, y :
 onp getA getB m n =
     let
         v =
-            Array.initialize (m + n + 1) 0 (always [])
+            Array.initialize (m + n + 1) 0 (\_ -> [])
 
         delta =
             n - m
