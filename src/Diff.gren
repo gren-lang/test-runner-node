@@ -97,10 +97,10 @@ testDiff a b =
         -- Gren's Array doesn't allow null element,
         -- so we'll use shifted index to access source.
         getA =
-            \x -> Array.get (x - 1) a
+            \x -> arrayClassicGet (x - 1) a
 
         getB =
-            \y -> Array.get (y - 1) b
+            \y -> arrayClassicGet (y - 1) b
 
         path =
             -- Is there any case ond is needed?
@@ -277,10 +277,10 @@ step :
 step snake_ offset k v =
     let
         fromLeft =
-            Maybe.withDefault [] (Array.get (k - 1 + offset) v)
+            Maybe.withDefault [] (arrayClassicGet (k - 1 + offset) v)
 
         fromTop =
-            Maybe.withDefault [] (Array.get (k + 1 + offset) v)
+            Maybe.withDefault [] (arrayClassicGet (k + 1 + offset) v)
 
         { path, point = { x, y } } =
             case { l = Array.popFirst fromLeft, t = Array.popFirst fromTop } of
@@ -338,3 +338,12 @@ snake getA getB nextX nextY path =
 
         _ ->
             { array = path, result = False }
+
+
+arrayClassicGet : Int -> Array a -> Maybe a
+arrayClassicGet index array =
+    if index < 0 then
+        Nothing
+
+    else
+        Array.get index array
