@@ -11,6 +11,7 @@ A minimal test program will have the following in a Main.gren file:
 ```gren
 module Main exposing (main)
 
+import Expect
 import Test exposing (describe, test)
 import Test.Runner.Node exposing (Program, run)
 
