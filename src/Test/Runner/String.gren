@@ -35,7 +35,7 @@ toOutput summary seededRunners =
         render =
             Array.foldl toOutputHelp
     in
-    case seededRunners of
+    when seededRunners is
         Plain runners ->
             render { summary | autoFail = Nothing } runners
 
@@ -76,7 +76,7 @@ fromExpectation labels expectation summary =
 
         summaryWithDistribution : Summary
         summaryWithDistribution =
-            case distributionReport of
+            when distributionReport is
                 Nothing ->
                     summary
 
@@ -89,7 +89,7 @@ fromExpectation labels expectation summary =
                                 ++ "\n"
                     }
     in
-    case Test.Runner.getFailureReason expectation of
+    when Test.Runner.getFailureReason expectation is
         Nothing ->
             { summaryWithDistribution | passed = summaryWithDistribution.passed + 1 }
 
@@ -99,7 +99,7 @@ fromExpectation labels expectation summary =
                     Test.Runner.String.Format.format description reason
 
                 prefix =
-                    case given of
+                    when given is
                         Nothing ->
                             ""
 

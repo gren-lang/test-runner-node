@@ -9,7 +9,7 @@ import Test.Runner
 
 report : Array String -> DistributionReport -> Maybe String
 report testBreadcrumbs distributionReport =
-    case distributionReport of
+    when distributionReport is
         NoDistribution ->
             Nothing
 

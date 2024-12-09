@@ -16,20 +16,21 @@ import Random
 import Test.Runner.String exposing (Summary)
 import String
 import Test exposing (Test)
-import Stream exposing (Stream)
+import Stream
 import Node
-import Task
+import Task exposing (Task)
+import Bytes exposing (Bytes)
 
 
 type alias OutputStreams =
-    { reportStreamOnPass : Stream
-    , reportStreamOnFail : Stream
+    { reportStreamOnPass : Stream.Writable Bytes
+    , reportStreamOnFail : Stream.Writable Bytes
     }
 
 
 {-| Run the test using the provided options.
 -}
-runWithOptions : OutputStreams -> Int -> Random.Seed -> Test -> Cmd a
+runWithOptions : OutputStreams -> Int -> Random.Seed -> Test -> Task Never {}
 runWithOptions streams runs seed test =
     Test.Runner.String.runWithOptions runs seed test
         |> logOutput streams
@@ -43,7 +44,7 @@ summarize { output, passed, failed, autoFail } =
                 "TEST RUN FAILED"
 
             else
-                case autoFail of
+                when autoFail is
                     Nothing ->
                         "TEST RUN PASSED"
 
@@ -58,7 +59,7 @@ summarize { output, passed, failed, autoFail } =
         ]
 
 
-logOutput : OutputStreams -> Summary -> Cmd a
+logOutput : OutputStreams -> Summary -> Task Never {}
 logOutput streams summary =
     let
         output =
@@ -75,7 +76,7 @@ logOutput streams summary =
                 , exitCode = 0
                 }
     in
-    Stream.sendString printStream output
+    Stream.writeLineAsBytes output printStream
         |> Task.andThen (\_ -> Node.exitWithCode exitCode)
-        |> Task.execute
+        |> Task.onError (\_ -> Node.exitWithCode 1)
 

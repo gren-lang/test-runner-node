@@ -35,7 +35,7 @@ run : Test -> Program
 run test =
     Node.defineSimpleProgram <| \env ->
         Init.awaitTask Time.now <| \time ->
-            Node.endWithCmd <|
+            Node.endSimpleProgram <|
                 Log.runWithOptions
                     { reportStreamOnPass = env.stdout
                     , reportStreamOnFail = env.stderr
@@ -65,7 +65,7 @@ type alias Options =
 runWithOptions : Options -> Test -> Program
 runWithOptions options test =
     Node.defineSimpleProgram <| \env ->
-        Node.endWithCmd <|
+        Node.endSimpleProgram <|
             Log.runWithOptions
                 { reportStreamOnPass = env.stdout
                 , reportStreamOnFail = env.stderr

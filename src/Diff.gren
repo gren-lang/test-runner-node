@@ -32,7 +32,7 @@ type StepResult
 type BugReport
     = CannotGetA Int
     | CannotGetB Int
-    | UnexpectedPath { x : Int, y : Int } (Array { x : Int, y : Int })
+    | UnexpectedPath { pos : { x : Int, y : Int }, path : (Array { x : Int, y : Int }) }
 
 
 {-| Compares two text.
@@ -74,7 +74,7 @@ diffLines a b =
 -}
 diff : Array a -> Array a -> Array (Change a)
 diff a b =
-    case testDiff a b of
+    when testDiff a b is
         Ok changes ->
             changes
 
@@ -116,7 +116,7 @@ makeChanges :
     -> Array { x : Int, y : Int }
     -> Result BugReport (Array (Change a))
 makeChanges getA getB path =
-    case Array.popFirst path of
+    when Array.popFirst path is
         Nothing ->
             Ok []
 
@@ -132,7 +132,7 @@ makeChangesHelp :
     -> Array { x : Int, y : Int }
     -> Result BugReport (Array (Change a))
 makeChangesHelp changes getA getB { x, y } path =
-    case Array.popFirst path of
+    when Array.popFirst path is
         Nothing ->
             Ok changes
 
@@ -140,7 +140,7 @@ makeChangesHelp changes getA getB { x, y } path =
             let
                 change =
                     if x - 1 == prevX && y - 1 == prevY then
-                        case getA x of
+                        when getA x is
                             Just a ->
                                 Ok (NoChange a)
 
@@ -148,7 +148,7 @@ makeChangesHelp changes getA getB { x, y } path =
                                 Err (CannotGetA x)
 
                     else if x == prevX then
-                        case getB y of
+                        when getB y is
                             Just b ->
                                 Ok (Added b)
 
@@ -156,7 +156,7 @@ makeChangesHelp changes getA getB { x, y } path =
                                 Err (CannotGetB y)
 
                     else if y == prevY then
-                        case getA x of
+                        when getA x is
                             Just a ->
                                 Ok (Removed a)
 
@@ -164,9 +164,9 @@ makeChangesHelp changes getA getB { x, y } path =
                                 Err (CannotGetA x)
 
                     else
-                        Err (UnexpectedPath { x = x, y = y } path)
+                        Err (UnexpectedPath { pos = { x = x, y = y }, path = path })
             in
-            case change of
+            when change is
                 Ok c ->
                     makeChangesHelp (Array.pushFirst c changes) getA getB { x =  prevX, y = prevY } tail
 
@@ -198,7 +198,7 @@ ondLoopDK snake_ offset d k v =
         ondLoopDK snake_ offset (d + 1) (-d - 1) v
 
     else
-        case step snake_ offset k v of
+        when step snake_ offset k v is
             Found path ->
                 path
 
@@ -240,7 +240,7 @@ onpLoopP snake_ delta offset p v =
                 Array.reverse (Array.range (delta + 1) p)
                     ++ Array.range (-p + delta) delta
     in
-    case onpLoopK snake_ offset ks v of
+    when onpLoopK snake_ offset ks v is
         Found path ->
             path
 
@@ -255,12 +255,12 @@ onpLoopK :
     -> Array (Array { x : Int, y : Int })
     -> StepResult
 onpLoopK snake_ offset ks v =
-    case Array.popFirst ks of
+    when Array.popFirst ks is
         Nothing ->
             Continue v
 
         Just { first = k, rest = ks_ } ->
-            case step snake_ offset k v of
+            when step snake_ offset k v is
                 Found path ->
                     Found path
 
@@ -283,7 +283,7 @@ step snake_ offset k v =
             Maybe.withDefault [] (arrayClassicGet (k + 1 + offset) v)
 
         { path, point = { x, y } } =
-            case { l = Array.popFirst fromLeft, t = Array.popFirst fromTop } of
+            when { l = Array.popFirst fromLeft, t = Array.popFirst fromTop } is
                 { l = Nothing, t = Nothing } ->
                     { path = [], point = { x = 0, y = 0 } }
 
@@ -319,7 +319,7 @@ snake :
     -> Array { x : Int, y : Int }
     -> { array : Array { x : Int, y : Int }, result : Bool }
 snake getA getB nextX nextY path =
-    case { l = getA nextX, r = getB nextY } of
+    when { l = getA nextX, r = getB nextY } is
         { l = Just a, r = Just b } ->
             if a == b then
                 snake
