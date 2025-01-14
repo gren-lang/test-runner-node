@@ -17,6 +17,7 @@ import Node
 import Init
 import Test.Runner.Log as Log
 import Random
+import Terminal
 import Time
 
 
@@ -35,10 +36,12 @@ run : Test -> Program
 run test =
     Node.defineSimpleProgram <| \env ->
         Init.awaitTask Time.now <| \time ->
+        Init.await Terminal.initialize <| \termConfig ->
             Node.endSimpleProgram <|
                 Log.runWithOptions
                     { reportStreamOnPass = env.stdout
                     , reportStreamOnFail = env.stderr
+                    , colorDepth = getColorDepth termConfig
                     }
                     100
                     (Random.initialSeed (Time.posixToMillis time))
@@ -65,12 +68,23 @@ type alias Options =
 runWithOptions : Options -> Test -> Program
 runWithOptions options test =
     Node.defineSimpleProgram <| \env ->
-        Node.endSimpleProgram <|
-            Log.runWithOptions
-                { reportStreamOnPass = env.stdout
-                , reportStreamOnFail = env.stderr
-                }
-                options.runs
-                options.seed
-                test
+        Init.await Terminal.initialize <| \termConfig ->
+            Node.endSimpleProgram <|
+                Log.runWithOptions
+                    { reportStreamOnPass = env.stdout
+                    , reportStreamOnFail = env.stderr
+                    , colorDepth = getColorDepth termConfig
+                    }
+                    options.runs
+                    options.seed
+                    test
            
+
+getColorDepth : Maybe Terminal.Configuration -> Int
+getColorDepth config =
+    when config is
+        Just { colorDepth } ->
+            colorDepth
+        Nothing ->
+            1 -- lowest color depth (no colors)
+
