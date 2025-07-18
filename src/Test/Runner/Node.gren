@@ -37,7 +37,7 @@ run test =
     Node.defineSimpleProgram <| \env ->
         Init.awaitTask Time.now <| \time ->
         Init.await Terminal.initialize <| \termConfig ->
-            Node.endSimpleProgram <|
+            Node.endSimpleProgramWithCmd <|
                 Log.runWithOptions
                     { reportStreamOnPass = env.stdout
                     , reportStreamOnFail = env.stderr
@@ -69,7 +69,7 @@ runWithOptions : Options -> Test -> Program
 runWithOptions options test =
     Node.defineSimpleProgram <| \env ->
         Init.await Terminal.initialize <| \termConfig ->
-            Node.endSimpleProgram <|
+            Node.endSimpleProgramWithCmd <|
                 Log.runWithOptions
                     { reportStreamOnPass = env.stdout
                     , reportStreamOnFail = env.stderr

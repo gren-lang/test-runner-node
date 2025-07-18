@@ -37,7 +37,7 @@ type Color
 
 {-| Run the test using the provided options.
 -}
-runWithOptions : OutputStreams -> Int -> Random.Seed -> Test -> Task Never {}
+runWithOptions : OutputStreams -> Int -> Random.Seed -> Test -> Cmd a
 runWithOptions streams runs seed test =
     Test.Runner.String.runWithOptions runs seed test
         |> logOutput streams
@@ -69,7 +69,7 @@ summarize { output, passed, failed, autoFail } colorDepth =
         ]
 
 
-logOutput : OutputStreams -> Summary -> Task Never {}
+logOutput : OutputStreams -> Summary -> Cmd a
 logOutput streams summary =
     let
         output =
@@ -87,8 +87,9 @@ logOutput streams summary =
                 }
     in
     Stream.writeLineAsBytes output printStream
-        |> Task.andThen (\_ -> Node.exitWithCode exitCode)
-        |> Task.onError (\_ -> Node.exitWithCode 1)
+        |> Task.map (\_ -> Node.exitWithCode exitCode)
+        |> Task.onError (\_ -> Task.succeed <| Node.exitWithCode 1)
+        |> Task.executeCmd
 
 
 colorize : Int -> Color -> String -> String
