@@ -2,3 +2,4 @@
 .DS_Store
 .gren/
 node_modules/
+.envrc
